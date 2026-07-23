@@ -1,0 +1,421 @@
+<div id="diag-root"></div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,18,500&display=swap');
+
+  #diag-root {
+    --bg: #FAF8F4;
+    --ink: #1B2530;
+    --muted: #5B636C;
+    --blue: #3B6BFF;
+    --line: #E7E3DC;
+    --card: #FFFFFF;
+    --soft: rgba(27,37,48,.05);
+    --weak: #C0392B; --weak-bg: rgba(192,57,43,.08);
+    --mid:  #B7791F; --mid-bg:  rgba(183,121,31,.10);
+    --ok:   #2F855A; --ok-bg:   rgba(47,133,90,.10);
+
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 56px 26px 60px;
+    box-sizing: border-box;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  #diag-root *, #diag-root *::before, #diag-root *::after { box-sizing: border-box; }
+  #diag-root h1, #diag-root h2, #diag-root h3 { margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+  #diag-root em { font-family: 'Newsreader', serif; font-style: italic; font-weight: 500; font-size: 0.86em; color: var(--blue); letter-spacing: 0; vertical-align: -0.01em; }
+
+  .d-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin: 0 0 20px; }
+
+  /* ---- intro ---- */
+  .d-intro h1 { font-size: clamp(30px, 6.5vw, 44px); line-height: 1.18; margin: 0 0 20px; }
+  .d-intro > p { font-size: 17px; color: var(--muted); margin: 0 0 36px; max-width: 44ch; }
+  .d-meta { display: flex; gap: 36px; margin: 0 0 40px; flex-wrap: wrap; }
+  .d-meta-item { font-size: 13px; color: var(--muted); }
+  .d-meta-icon { display: block; width: 22px; height: 22px; color: var(--blue); margin-bottom: 10px; }
+  .d-meta-item b { display: block; font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 2px; }
+
+  .d-btn {
+    font-family: 'Inter'; font-weight: 600; font-size: 16px;
+    background: var(--blue); color: #fff; border: none; border-radius: 8px;
+    padding: 16px 32px; cursor: pointer; transition: background .15s ease, transform .1s;
+  }
+  .d-btn:hover { background: #2b57e0; }
+  .d-btn:active { transform: translateY(1px); }
+  .d-btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+  /* ---- progress ---- */
+  .d-top { display: flex; align-items: center; justify-content: space-between; margin: 0 0 18px; }
+  .d-block-label { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); }
+  .d-count { font-size: 13px; color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .d-bar { height: 3px; background: var(--soft); border-radius: 3px; overflow: hidden; margin: 0 0 40px; }
+  .d-bar > span { display: block; height: 100%; background: var(--blue); border-radius: 3px; transition: width .35s cubic-bezier(.4,0,.2,1); }
+
+  /* ---- question ---- */
+  .d-q { font-size: clamp(21px, 4.4vw, 27px); font-weight: 800; line-height: 1.24; letter-spacing: -0.02em; margin: 0 0 12px; }
+  .d-hint { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 0 0 30px; max-width: 52ch; }
+  .d-hint:empty { margin: 0 0 12px; }
+  .d-answers { display: flex; flex-direction: column; gap: 10px; }
+  .d-ans {
+    text-align: left; font-family: 'Inter'; font-size: 16px; font-weight: 500; color: var(--ink);
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 17px 20px; cursor: pointer; transition: border-color .14s, background .14s, transform .1s;
+  }
+  .d-ans:hover { border-color: var(--blue); }
+  .d-ans:active { transform: translateY(1px); }
+  .d-ans:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  .d-back { margin-top: 28px; background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 6px 0; font-family: 'Inter'; }
+  .d-back:hover { color: var(--ink); }
+  .d-back:disabled { opacity: .35; cursor: default; }
+
+  /* ---- result ---- */
+  .d-res-level { background: var(--ink); color: var(--bg); border-radius: 14px; padding: 34px 32px 30px; margin: 0 0 36px; }
+  .d-res-level .d-eyebrow { color: var(--blue); margin-bottom: 16px; }
+  .d-res-level h2 { font-size: clamp(24px, 5.2vw, 32px); line-height: 1.18; margin: 0 0 16px; }
+  .d-res-level p { font-size: 15.5px; color: rgba(250,248,244,.72); margin: 0; max-width: 58ch; }
+  .d-res-score { font-weight: 700; color: var(--blue); font-size: 14px; margin-top: 20px; font-variant-numeric: tabular-nums; }
+
+  .d-res-h { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 20px; }
+
+  .d-row { padding: 17px 0; border-top: 1px solid var(--line); }
+  .d-row:first-of-type { border-top: none; }
+  .d-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+  .d-row-name { font-weight: 700; font-size: 16.5px; letter-spacing: -0.01em; }
+  .d-row-tag { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .tag-weak { color: var(--weak); background: var(--weak-bg); }
+  .tag-mid  { color: var(--mid);  background: var(--mid-bg); }
+  .tag-ok   { color: var(--ok);   background: var(--ok-bg); }
+  .d-track { height: 5px; background: var(--soft); border-radius: 5px; overflow: hidden; }
+  .d-track > span { display: block; height: 100%; border-radius: 5px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+  .fill-weak > span { background: var(--weak); }
+  .fill-mid  > span { background: var(--mid); }
+  .fill-ok   > span { background: var(--ok); }
+  .d-diag { font-size: 14px; color: var(--muted); margin: 11px 0 0; line-height: 1.5; }
+
+  /* ---- booking form (основной блок — акцентная заливка, primary-кнопка) ---- */
+  .d-cta {
+    margin-top: 40px; border-radius: 14px; padding: 32px 30px;
+    background: rgba(59,107,255,.045); border: 1.5px solid rgba(59,107,255,.22);
+  }
+  .d-cta h3 { font-size: 22px; margin: 0 0 16px; line-height: 1.3; }
+  .d-cta > p { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 48ch; line-height: 1.55; }
+  .d-cta > p:last-of-type { margin-bottom: 24px; }
+  .d-form { display: flex; gap: 12px; flex-wrap: wrap; }
+  .d-form input {
+    flex: 1; min-width: 150px; font-family: 'Inter'; font-size: 15px; color: var(--ink);
+    background: #fff; border: 1.5px solid var(--line); border-radius: 9px; padding: 14px 16px;
+  }
+  .d-form input:focus { outline: none; border-color: var(--blue); }
+  .d-form input.err { border-color: var(--weak); }
+  .d-form .d-btn { flex: none; padding: 14px 28px; }
+  .d-form-done { font-size: 15px; color: var(--ok); font-weight: 500; padding: 4px 0; }
+
+  /* ---- email / pdf (второстепенный блок — контурная кнопка, нейтральная карточка) ---- */
+  .d-mail { margin-top: 16px; background: var(--card); border: 1.5px dashed var(--line); border-radius: 14px; padding: 28px 30px; }
+  .d-mail label { display: block; font-size: 19px; font-weight: 800; color: var(--ink); margin: 0 0 16px; letter-spacing: -0.02em; line-height: 1.3; }
+  .d-mail-lead { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 48ch; line-height: 1.55; }
+  .d-mail-lead:last-of-type { margin-bottom: 24px; }
+  .d-mail-in { display: flex; gap: 12px; flex-wrap: wrap; }
+  .d-mail input {
+    flex: 1; min-width: 180px; font-family: 'Inter'; font-size: 15px; color: var(--ink);
+    background: var(--bg); border: 1.5px solid var(--line); border-radius: 9px; padding: 14px 16px;
+  }
+  .d-mail input:focus { outline: none; border-color: var(--blue); }
+  .d-mail input.err { border-color: var(--weak); }
+  .d-mail .d-btn-outline { flex: none; padding: 13px 25px; }
+  .d-mail-note { font-size: 13px; color: var(--muted); margin: 14px 0 0; }
+  .d-mail-done { font-size: 15px; color: var(--ok); font-weight: 500; }
+
+  .d-btn-outline {
+    font-family: 'Inter'; font-weight: 600; font-size: 16px;
+    background: transparent; color: var(--blue); border: 1.5px solid var(--blue); border-radius: 8px;
+    padding: 14.5px 30px; cursor: pointer; transition: background .15s ease, transform .1s;
+  }
+  .d-btn-outline:hover { background: rgba(59,107,255,.08); }
+  .d-btn-outline:active { transform: translateY(1px); }
+  .d-btn-outline:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+  .d-privacy { font-size: 12.5px; color: var(--muted); margin: 14px 0 0; line-height: 1.5; }
+  .d-privacy a { color: var(--blue); text-decoration: underline; }
+
+  .d-restart { margin-top: 30px; background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; font-family: 'Inter'; text-decoration: underline; }
+  .d-restart:hover { color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) { #diag-root * { transition: none !important; } }
+</style>
+
+<script>
+(function () {
+  const BLOCKS = [
+    { key: 'Стратегия',
+      weak: 'Нет ясного направления роста. Решения принимаются реактивно, а не из цели — отсюда распыление бюджета и усилий.',
+      mid:  'Направление есть, но сформулировано не до конца. Клиент не всегда понимает, почему именно вы.',
+      ok:   'Есть цель и понимание точек роста — прочная основа для планирования.',
+      qs: [
+        { q: 'Есть ли у компании четкая цель развития на ближайшие 12 месяцев?',
+          h: 'Сформулируйте цель одним предложением. Если она существует только «в голове» или постоянно меняется — скорее это «Частично».' },
+        { q: 'Можете ли вы за 30 секунд объяснить, почему клиент должен выбрать именно вас?',
+          h: 'Не отвечайте сразу «Да». Засеките 30 секунд и попробуйте вслух объяснить свое главное преимущество. Если объяснение размытое или свелось к «качеству» и «индивидуальному подходу» — скорее «Частично» или «Нет».' },
+        { q: 'Знаете ли вы, за счет чего сможете увеличить прибыль в ближайший год?',
+          h: 'Назовите 2–3 конкретных действия или направления роста. Если ответ звучит как «будем больше продавать» — этого недостаточно.' }
+      ] },
+
+    { key: 'Клиенты и продукт',
+      weak: 'Вы не до конца понимаете, кто из клиентов приносит прибыль и почему выбирают вас. Оффер бьет мимо потребности.',
+      mid:  'Клиента понимаете частично. Есть риск, что предложение не попадает в реальную потребность.',
+      ok:   'Понимаете, кто платит и почему. Оффер попадает в потребность.',
+      qs: [
+        { q: 'Вы знаете, какие категории клиентов приносят бизнесу наибольшую прибыль?',
+          h: 'Именно описание групп самых прибыльных клиентов.' },
+        { q: 'Понимаете ли вы, почему эти клиенты выбирают именно вас, а не конкурентов?',
+          h: 'Назовите себе три реальные причины, подтвержденные общением с клиентами, а не собственными предположениями.' },
+        { q: 'Уверены ли вы, что ваше предложение/продукт полностью соответствует потребностям этих клиентов?',
+          h: 'Когда вы в последний раз проверяли это через интервью, обратную связь или анализ продаж? Если ответ основан только на ощущениях — скорее «Частично».' }
+      ] },
+
+    { key: 'Привлечение клиентов',
+      weak: 'Поток клиентов держится на одном канале. Отключится — бизнес встанет. Это главный риск.',
+      mid:  'Каналы есть, но нет ясности, какой приносит прибыль, а не просто заявки.',
+      ok:   'Привлечение диверсифицировано и управляемо.',
+      qs: [
+        { q: 'Есть ли у вас стабильный источник новых клиентов?',
+          h: 'Если поток заявок сильно меняется от месяца к месяцу или зависит от одного человека либо одного канала, ответ скорее «Частично».' },
+        { q: 'Вы знаете, какие каналы приносят больше всего прибыли, а не просто заявок?',
+          h: 'Если не можете подтвердить это цифрами, выберите «Частично» или «Нет».' },
+        { q: 'Если завтра отключится один источник клиентов, бизнес продолжит стабильно работать?',
+          h: '' }
+      ] },
+
+    { key: 'Продажи',
+      weak: 'Лиды теряются между заявкой и оплатой, и вы не видите, где именно. Деньги утекают на последнем шаге.',
+      mid:  'Процесс продаж есть, но контроль неполный — часть лидов теряется незаметно.',
+      ok:   'Воронка продаж под контролем, потери видны и управляемы.',
+      qs: [
+        { q: 'Вы знаете, на каком этапе чаще всего теряются потенциальные клиенты?',
+          h: 'Если можете показать это на основе статистики или CRM — отвечайте «Да». Если это только предположение — скорее «Частично».' },
+        { q: 'Контролируете ли вы качество обработки заявок и работу менеджеров?',
+          h: 'Контроль — это регулярная проверка звонков, переписок, конверсии или других показателей.' },
+        { q: 'Есть ли у вас описанный процесс продаж, который соблюдает команда?',
+          h: 'Важно реальное использование сотрудниками.' }
+      ] },
+
+    { key: 'Аналитика',
+      weak: 'Решения принимаются на интуиции. Без CPO и ключевых метрик не видно, что работает, а что жжет бюджет.',
+      mid:  'Данные есть, но не всегда ложатся в основу решений.',
+      ok:   'Решения на данных. Метрики под контролем.',
+      qs: [
+        { q: 'Знаете ли вы стоимость привлечения одного клиента?',
+          h: 'Если можете назвать цифру без долгих поисков и понимаете, как она рассчитывается — отвечайте «Да».' },
+        { q: 'Регулярно ли вы анализируете ключевые показатели бизнеса?',
+          h: 'Регулярно — это по установленному графику с использованием данных для принятия решений.' },
+        { q: 'Принимаете ли вы маркетинговые решения на основе данных, а не интуиции?',
+          h: 'Вспомните последние несколько решений. Они были основаны на цифрах или потому что «вы так считаете»?' }
+      ] },
+
+    { key: 'Удержание клиентов',
+      weak: 'База не работает на повторные продажи. Вы платите за привлечение снова там, где могли бы зарабатывать на своих клиентах.',
+      mid:  'Повторные продажи есть, но несистемно — потенциал базы недоиспользован.',
+      ok:   'База приносит повторные продажи системно.',
+      qs: [
+        { q: 'Есть ли система возврата клиентов после первой покупки?',
+          h: 'Именно регулярный процесс, который действительно работает.' },
+        { q: 'Используете ли вы клиентскую базу для повторных продаж?',
+          h: '' },
+        { q: 'Знаете ли вы, какой процент клиентов покупает повторно?',
+          h: 'Если не можете назвать хотя бы примерное значение, основанное на данных, выберите «Нет».' }
+      ] },
+
+    { key: 'Управление',
+      weak: 'Маркетинг и продажи завязаны на вас. Бизнес не может расти быстрее вашего личного участия.',
+      mid:  'Часть процессов автономна, но ключевые решения все еще на вас.',
+      ok:   'Есть распределенная ответственность. Бизнес устойчив без ручного управления.',
+      qs: [
+        { q: 'Может ли бизнес работать несколько недель без вашего постоянного участия?',
+          h: '' },
+        { q: 'Есть ли в компании понятная ответственность за маркетинг и продажи?',
+          h: 'Каждый понимает свою роль, зоны ответственности и ожидаемый результат.' },
+        { q: 'Есть ли сейчас одна главная проблема, которая мешает бизнесу расти, и понятен ли план ее решения?',
+          h: 'Попробуйте назвать эту проблему одним предложением и сразу сформулировать план действий. Если не получается — скорее «Частично» или «Нет».' }
+      ] }
+  ];
+
+  const QUESTIONS = [];
+  BLOCKS.forEach((b, bi) => b.qs.forEach((x, qi) => QUESTIONS.push({ q: x.q, h: x.h, bi, qi })));
+  const TOTAL = QUESTIONS.length;
+
+  const LEVELS = [
+    { min: 34, title: 'Система выстроена', desc: 'У вашего бизнеса уже есть прочный фундамент: большинство ключевых процессов выстроено и работает достаточно системно. Сейчас основной потенциал роста — в точечной оптимизации, поиске новых возможностей и повышении эффективности уже работающих инструментов.' },
+    { min: 22, title: 'Хорошая основа для роста', desc: 'У бизнеса уже есть сильные стороны, но некоторые процессы работают недостаточно системно. Именно они могут ограничивать дальнейший рост. Если устранить эти узкие места, компания сможет расти быстрее и стабильнее.' },
+    { min: 11, title: 'Есть потенциал, но не хватает системы', desc: 'Многие решения пока принимаются ситуативно, а отдельные процессы зависят от ручного управления. Это не означает, что бизнес работает плохо, но делает рост менее предсказуемым и сложнее масштабируемым.' },
+    { min: 0,  title: 'Есть над чем работать', desc: 'Диагностика показывает, что многие процессы пока не выстроены системно. Это может влиять на стабильность привлечения клиентов, продаж и развития бизнеса. Хорошая новость в том, что именно здесь обычно находится наибольший потенциал для роста.' }
+  ];
+
+  const root = document.getElementById('diag-root');
+  let answers = new Array(TOTAL).fill(null);
+  let cur = -1;
+
+  function render() {
+    if (cur < 0) return renderIntro();
+    if (cur >= TOTAL) return renderResult();
+    renderQuestion();
+  }
+
+  function renderIntro() {
+    root.innerHTML = `
+      <div class="d-intro">
+        <p class="d-eyebrow">Экспресс-диагностика</p>
+        <h1>Где ваш маркетинг <em>теряет</em> деньги</h1>
+        <p>21 вопрос о стратегии, клиентах, продажах и аналитике. В конце — карта ваших слабых зон и что с ними делать.</p>
+        <div class="d-meta">
+          <div class="d-meta-item">
+            <svg class="d-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.4 1.1-1.4 2"/><path d="M12 16.6h.01"/></svg>
+            <b>21</b> вопрос
+          </div>
+          <div class="d-meta-item">
+            <svg class="d-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2v5l3.2 3"/></svg>
+            <b>3</b> минуты
+          </div>
+          <div class="d-meta-item">
+            <svg class="d-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.2"/></svg>
+            <b>7</b> зон бизнеса
+          </div>
+        </div>
+        <button class="d-btn" id="d-start">Начать диагностику</button>
+      </div>`;
+    root.querySelector('#d-start').onclick = () => { cur = 0; render(); top(); };
+  }
+
+  function renderQuestion() {
+    const item = QUESTIONS[cur];
+    const block = BLOCKS[item.bi];
+    const pct = Math.round((cur / TOTAL) * 100);
+    root.innerHTML = `
+      <div class="d-top">
+        <span class="d-block-label">${block.key}</span>
+        <span class="d-count">${cur + 1} / ${TOTAL}</span>
+      </div>
+      <div class="d-bar"><span style="width:${pct}%"></span></div>
+      <p class="d-q">${item.q}</p>
+      <p class="d-hint">${item.h || ''}</p>
+      <div class="d-answers">
+        <button class="d-ans" data-v="2">Да</button>
+        <button class="d-ans" data-v="1">Частично</button>
+        <button class="d-ans" data-v="0">Нет</button>
+      </div>
+      <button class="d-back" ${cur === 0 ? 'disabled' : ''}>← Назад</button>`;
+    root.querySelectorAll('.d-ans').forEach(btn => {
+      btn.onclick = () => { answers[cur] = parseInt(btn.dataset.v, 10); cur++; render(); top(); };
+    });
+    root.querySelector('.d-back').onclick = () => { if (cur > 0) { cur--; render(); top(); } };
+  }
+
+  function blockScores() {
+    return BLOCKS.map((b, bi) => {
+      let s = 0;
+      QUESTIONS.forEach((item, i) => { if (item.bi === bi) s += (answers[i] || 0); });
+      return { bi, key: b.key, score: s };
+    });
+  }
+  function statusOf(s) { return s >= 5 ? 'ok' : s >= 3 ? 'mid' : 'weak'; }
+  const TAGS = { ok: 'сильно', mid: 'зона внимания', weak: 'слабое место' };
+
+  function renderResult() {
+    const total = answers.reduce((a, b) => a + (b || 0), 0);
+    const level = LEVELS.find(l => total >= l.min);
+    const scores = blockScores().sort((a, b) => a.score - b.score);
+
+    const rows = scores.map(s => {
+      const st = statusOf(s.score);
+      const b = BLOCKS[s.bi];
+      const diag = st === 'ok' ? b.ok : st === 'mid' ? b.mid : b.weak;
+      const pct = Math.round((s.score / 6) * 100);
+      return `
+        <div class="d-row">
+          <div class="d-row-head">
+            <span class="d-row-name">${s.key}</span>
+            <span class="d-row-tag tag-${st}">${TAGS[st]}</span>
+          </div>
+          <div class="d-track fill-${st}"><span style="width:${pct}%"></span></div>
+          <p class="d-diag">${diag}</p>
+        </div>`;
+    }).join('');
+
+    root.innerHTML = `
+      <div class="d-res-level">
+        <p class="d-eyebrow">Ваш результат</p>
+        <h2>${level.title}</h2>
+        <p>${level.desc}</p>
+        <div class="d-res-score">${total} из ${TOTAL * 2} баллов зрелости</div>
+      </div>
+
+      <p class="d-res-h">Профиль по зонам · от слабых к сильным</p>
+      ${rows}
+
+      <div class="d-cta">
+        <h3>Давайте разберем вашу ситуацию</h3>
+        <p>Иногда нескольких ответов в тесте достаточно, чтобы увидеть возможные точки роста, но не всегда понятно, с чего начать.</p>
+        <p>Если хотите обсудить именно ваш бизнес, оставьте контакты. Мы созвонимся, разберем результаты диагностики и вместе поймем, какие шаги будут наиболее полезны.</p>
+        <div class="d-form" id="d-bookform">
+          <input type="text" id="d-name" placeholder="Имя" autocomplete="name">
+          <input type="tel" id="d-phone" placeholder="Телефон" autocomplete="tel">
+          <button class="d-btn" id="d-book">Записаться на созвон</button>
+        </div>
+        <p class="d-privacy">Нажимая на кнопку, вы соглашаетесь с <a href="http://lyskomarketing.ru/public-privacy" target="_blank" rel="noopener">политикой обработки персональных данных</a>.</p>
+      </div>
+
+      <div class="d-mail" id="d-mailwrap">
+        <label for="d-email">Получите персональные рекомендации</label>
+        <p class="d-mail-lead">По результатам диагностики для вас сформирован PDF с рекомендациями.</p>
+        <p class="d-mail-lead">В нем собраны пояснения к результатам диагностики, комментарии и идеи, которые помогут посмотреть на бизнес глазами маркетингового директора.</p>
+        <p class="d-mail-lead">Отчет бесплатный. Надеюсь, он будет для вас полезен, даже если вы решите внедрять изменения самостоятельно.</p>
+        <div class="d-mail-in">
+          <input type="email" id="d-email" placeholder="you@example.com" autocomplete="email">
+          <button class="d-btn-outline" id="d-send">Получить PDF</button>
+        </div>
+        <p class="d-mail-note">PDF будет отправлен на указанную электронную почту.</p>
+        <p class="d-privacy">Нажимая на кнопку, вы соглашаетесь с <a href="http://lyskomarketing.ru/public-privacy" target="_blank" rel="noopener">политикой обработки персональных данных</a>.</p>
+      </div>
+
+      <button class="d-restart">Пройти заново</button>`;
+
+    const resultPayload = {
+      total,
+      blocks: blockScores().map(s => ({ zone: s.key, score: s.score, status: statusOf(s.score) }))
+    };
+
+    root.querySelector('.d-restart').onclick = () => {
+      answers = new Array(TOTAL).fill(null); cur = -1; render(); top();
+    };
+
+    root.querySelector('#d-book').onclick = () => {
+      const name = root.querySelector('#d-name');
+      const phone = root.querySelector('#d-phone');
+      let ok = true;
+      [name, phone].forEach(el => { el.classList.remove('err'); if (!el.value.trim()) { el.classList.add('err'); ok = false; } });
+      if (!ok) return;
+      // TILDA: отправьте {name, phone, ...resultPayload} в вашу форму / Google Apps Script
+      console.log('booking →', { name: name.value.trim(), phone: phone.value.trim(), ...resultPayload });
+      root.querySelector('#d-bookform').innerHTML =
+        `<p class="d-form-done">Спасибо, ${name.value.trim()}. Свяжусь с вами по указанному телефону.</p>`;
+    };
+
+    root.querySelector('#d-send').onclick = () => {
+      const email = root.querySelector('#d-email');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { email.classList.add('err'); return; }
+      // TILDA: отправьте {email, ...resultPayload} в вашу форму / Google Apps Script
+      console.log('pdf request →', { email: email.value.trim(), ...resultPayload });
+      root.querySelector('#d-mailwrap').innerHTML =
+        `<p class="d-mail-done">Готово. PDF придет на ${email.value.trim()} в ближайшее время.</p>`;
+    };
+  }
+
+  function top() { try { root.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
+
+  render();
+})();
+</script>
