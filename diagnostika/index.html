@@ -1,7 +1,19 @@
+<div id="diag-page">
 <div id="diag-root"></div>
+</div>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,18,500&display=swap');
+
+  @keyframes d-fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes d-fadeIn { from { opacity:0; } to { opacity:1; } }
+  @media (prefers-reduced-motion: reduce) { #diag-root * { animation: none !important; } }
+
+  #diag-page {
+    background: #EBE7DE;
+    padding: clamp(24px,5vw,56px) 16px;
+    box-sizing: border-box;
+  }
 
   #diag-root {
     --bg: #FAF8F4;
@@ -20,7 +32,9 @@
     background: var(--bg);
     max-width: 660px;
     margin: 0 auto;
-    padding: 56px 26px 60px;
+    border: 1.5px solid #DFD9CD;
+    border-radius: 20px;
+    padding: clamp(28px,6vw,56px) clamp(20px,5vw,40px) clamp(32px,6vw,60px);
     box-sizing: border-box;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -267,7 +281,7 @@
 
   function renderIntro() {
     root.innerHTML = `
-      <div class="d-intro">
+      <div class="d-intro" style="animation:d-fadeUp .6s cubic-bezier(.16,1,.3,1) both;">
         <p class="d-eyebrow">Экспресс-диагностика</p>
         <h1>Где ваш маркетинг <em>теряет</em> деньги</h1>
         <p>21 вопрос о стратегии, клиентах, продажах и аналитике. В конце — карта ваших слабых зон и что с ними делать.</p>
@@ -295,6 +309,7 @@
     const block = BLOCKS[item.bi];
     const pct = Math.round((cur / TOTAL) * 100);
     root.innerHTML = `
+      <div style="animation:d-fadeIn .35s ease both;">
       <div class="d-top">
         <span class="d-block-label">${block.key}</span>
         <span class="d-count">${cur + 1} / ${TOTAL}</span>
@@ -307,7 +322,8 @@
         <button class="d-ans" data-v="1">Частично</button>
         <button class="d-ans" data-v="0">Нет</button>
       </div>
-      <button class="d-back" ${cur === 0 ? 'disabled' : ''}>← Назад</button>`;
+      <button class="d-back" ${cur === 0 ? 'disabled' : ''}>← Назад</button>
+      </div>`;
     root.querySelectorAll('.d-ans').forEach(btn => {
       btn.onclick = () => { answers[cur] = parseInt(btn.dataset.v, 10); cur++; render(); top(); };
     });
@@ -346,6 +362,7 @@
     }).join('');
 
     root.innerHTML = `
+      <div style="animation:d-fadeIn .4s ease both;">
       <div class="d-res-level">
         <p class="d-eyebrow">Ваш результат</p>
         <h2>${level.title}</h2>
@@ -357,31 +374,31 @@
       ${rows}
 
       <div class="d-cta">
-        <h3>Давайте разберем вашу ситуацию</h3>
+        <h3>Давайте обсудим ваши вопросы</h3>
         <p>Иногда нескольких ответов в тесте достаточно, чтобы увидеть возможные точки роста, но не всегда понятно, с чего начать.</p>
-        <p>Если хотите обсудить именно ваш бизнес, оставьте контакты. Мы созвонимся, разберем результаты диагностики и вместе поймем, какие шаги будут наиболее полезны.</p>
+        <p>Если хотите обсудить ваши вопросы более конкретно, оставьте контакты. Мы созвонимся, разберем результаты диагностики и вместе поймем, какие шаги будут наиболее полезны и смогу ли я вам помочь.</p>
         <div class="d-form" id="d-bookform">
           <input type="text" id="d-name" placeholder="Имя" autocomplete="name">
           <input type="tel" id="d-phone" placeholder="Телефон" autocomplete="tel">
-          <button class="d-btn" id="d-book">Записаться на созвон</button>
+          <button class="d-btn" id="d-book">Отправить контакты</button>
         </div>
         <p class="d-privacy">Нажимая на кнопку, вы соглашаетесь с <a href="http://lyskomarketing.ru/public-privacy" target="_blank" rel="noopener">политикой обработки персональных данных</a>.</p>
       </div>
 
       <div class="d-mail" id="d-mailwrap">
         <label for="d-email">Получите персональные рекомендации</label>
-        <p class="d-mail-lead">По результатам диагностики для вас сформирован PDF с рекомендациями.</p>
-        <p class="d-mail-lead">В нем собраны пояснения к результатам диагностики, комментарии и идеи, которые помогут посмотреть на бизнес глазами маркетингового директора.</p>
-        <p class="d-mail-lead">Отчет бесплатный. Надеюсь, он будет для вас полезен, даже если вы решите внедрять изменения самостоятельно.</p>
+        <p class="d-mail-lead">По результатам диагностики для вас сформирован <b>PDF с рекомендациями</b>. В нем собраны пояснения к результатам диагностики, комментарии и идеи, которые помогут посмотреть на бизнес глазами маркетингового директора.</p>
+        <p class="d-mail-lead"><b>Отчет бесплатный. Надеюсь, он будет для вас полезен, даже если вы решите внедрять изменения самостоятельно.</b></p>
         <div class="d-mail-in">
           <input type="email" id="d-email" placeholder="you@example.com" autocomplete="email">
           <button class="d-btn-outline" id="d-send">Получить PDF</button>
         </div>
         <p class="d-mail-note">PDF будет отправлен на указанную электронную почту.</p>
-        <p class="d-privacy">Нажимая на кнопку, вы соглашаетесь с <a href="http://lyskomarketing.ru/public-privacy" target="_blank" rel="noopener">политикой обработки персональных данных</a>.</p>
+        <p class="d-privacy">Нажимая на кнопку, вы соглашаетесь с <a href="https://lyskomarketing.ru/privacy-policy/" target="_blank" rel="noopener">политикой обработки персональных данных</a>.</p>
       </div>
 
-      <button class="d-restart">Пройти заново</button>`;
+      <button class="d-restart">Пройти заново</button>
+      </div>`;
 
     const resultPayload = {
       total,
